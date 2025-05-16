@@ -17,5 +17,14 @@ namespace ThreeBodySimulation.Data
         /// Gets/sets the body's mass.
         /// </summary>
         public double Mass { get; set; }
+
+        public Body() { }
+
+        public Body(BodyPosition position, BodyPosition velocity, double mass)
+        {
+            Position = position;
+            Velocity = velocity;
+            Mass = mass;
+        }
     }
 }
