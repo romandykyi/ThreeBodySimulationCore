@@ -29,7 +29,18 @@ namespace ThreeBodySimulation.Simulation
         /// <summary>
         /// Gets/sets the equation solver that is used.
         /// </summary>
-        public IBodiesSolver Solver { get; set; } = new RK4BodiesSolver();
+        public IBodiesSolver Solver { get; set; }
+
+        public BodiesSimulator(
+            Body body1, Body body2, Body body3, IBodiesSolver solver, double g = 1.0
+            )
+        {
+            Body1 = body1;
+            Body2 = body2;
+            Body3 = body3;
+            Solver = solver;
+            G = g;
+        }
 
         private SimulationState GetSimulationState(double time)
         {

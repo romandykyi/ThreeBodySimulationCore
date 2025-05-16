@@ -127,13 +127,13 @@ namespace ThreeBodySimulation.Simulation
                     $" Expected 18 but was {vector.Length}.", nameof(vector));
             }
 
-            body1.Position = new(vector[0], vector[1], vector[2]);
-            body2.Position = new(vector[3], vector[4], vector[5]);
-            body3.Position = new(vector[6], vector[7], vector[8]);
+            body1.Position = new BodyPosition(vector[0], vector[1], vector[2]);
+            body2.Position = new BodyPosition(vector[3], vector[4], vector[5]);
+            body3.Position = new BodyPosition(vector[6], vector[7], vector[8]);
 
-            body1.Velocity = new(vector[9], vector[10], vector[11]);
-            body2.Velocity = new(vector[12], vector[13], vector[14]);
-            body3.Velocity = new(vector[15], vector[16], vector[17]);
+            body1.Velocity = new BodyPosition(vector[9], vector[10], vector[11]);
+            body2.Velocity = new BodyPosition(vector[12], vector[13], vector[14]);
+            body3.Velocity = new BodyPosition(vector[15], vector[16], vector[17]);
         }
     }
 }
