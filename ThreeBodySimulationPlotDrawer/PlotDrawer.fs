@@ -5,10 +5,12 @@ open Plotly.NET
 
 type SimPlotOptions = {
     drawCenterOfMass : bool
+    visualizationStep : double
 }
 
 let defaultSimPlotOptions = {
     drawCenterOfMass = false
+    visualizationStep = 0.01
 }
 
 let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOptions) = 
@@ -16,10 +18,20 @@ let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOp
     let body2Positions = ResizeArray()
     let body3Positions = ResizeArray()
 
+    let mutable prevTime = -infinity
+
     for state in simulator.Simulate(startTime, endTime) do
-        body1Positions.Add (state.Body1Position.X, state.Body1Position.Y, state.Body1Position.Z)
-        body2Positions.Add (state.Body2Position.X, state.Body2Position.Y, state.Body2Position.Z)
-        body3Positions.Add (state.Body3Position.X, state.Body3Position.Y, state.Body3Position.Z)
+        let timeStep = state.SimulationTime - prevTime
+        if options.visualizationStep <= 0.0 || timeStep >= options.visualizationStep then
+            let body1Pos = (state.Body1Position.X, state.Body1Position.Y, state.Body1Position.Z)
+            let body2Pos = (state.Body2Position.X, state.Body2Position.Y, state.Body2Position.Z)
+            let body3Pos = (state.Body3Position.X, state.Body3Position.Y, state.Body3Position.Z)
+
+            body1Positions.Add body1Pos
+            body2Positions.Add body2Pos
+            body3Positions.Add body3Pos
+
+            prevTime <- state.SimulationTime
 
     Chart.combine [
         // TODO: implement center of mass drawing
