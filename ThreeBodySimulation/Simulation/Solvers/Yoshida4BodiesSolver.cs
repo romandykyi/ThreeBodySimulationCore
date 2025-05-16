@@ -1,6 +1,5 @@
 using ThreeBodySimulation.Data;
 using ThreeBodySimulation.Numeric;
-using ThreeBodySimulation.Simulation;
 
 namespace ThreeBodySimulation.Simulation.Solvers
 {
