@@ -90,18 +90,24 @@ namespace ThreeBodySimulation.Numeric
             f(t, y, k1);
 
             Span<double> k2 = stackalloc double[n];
-            ScaleSpan(k1, step / 2, k2);
-            AddSpans(y, k2, k2);
+            for (int i = 0; i < n; i++)
+            {
+                k2[i] = y[i] + k1[i] * step / 2;
+            }
             f(t + step / 2, k2, k2);
 
             Span<double> k3 = stackalloc double[n];
-            ScaleSpan(k2, step / 2, k3);
-            AddSpans(y, k3, k3);
+            for (int i = 0; i < n; i++)
+            {
+                k3[i] = y[i] + k2[i] * step / 2;
+            }
             f(t + step / 2, k3, k3);
 
             Span<double> k4 = stackalloc double[n];
-            ScaleSpan(k3, step, k4);
-            AddSpans(y, k4, k4);
+            for (int i = 0; i < n; i++)
+            {
+                k4[i] = y[i] + k3[i] * step;
+            }
             f(t + step, k4, k4);
 
             for (int i = 0; i < n; i++)
