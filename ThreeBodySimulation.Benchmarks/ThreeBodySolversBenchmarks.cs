@@ -36,4 +36,11 @@ public class ThreeBodySolversBenchmarks
         RK4BodiesSolver solver = new() { Step = Step };
         Solve(solver);
     }
+
+    [Benchmark]
+    public void RK4Span()
+    {
+        RK4Solver solver = new() { Step = Step };
+        Solve(solver);
+    }
 }
