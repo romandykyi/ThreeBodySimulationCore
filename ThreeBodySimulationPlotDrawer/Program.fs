@@ -33,7 +33,7 @@ solver.Step <- step
 
 let simulator = BodiesSimulator(body1, body2, body3, solver, G)
 
-let options = { defaultSimPlotOptions with drawCenterOfMass = true }
+let options = { defaultSimPlotOptions with showCenterOfMass = true }
 let chart = plotSim simulator startTime endTime options
 
 chart |> Chart.show
