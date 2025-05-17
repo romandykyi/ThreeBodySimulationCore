@@ -24,9 +24,17 @@ public class ThreeBodySolversBenchmarks
     }
 
     [Benchmark]
+    [Obsolete("Benchmark")]
     public void Yoshida4()
     {
         Yoshida4BodiesSolver solver = new() { Step = Step };
+        Solve(solver);
+    }
+
+    [Benchmark]
+    public void Yoshida4Span()
+    {
+        Yoshida4Solver solver = new() { Step = Step };
         Solve(solver);
     }
 
