@@ -3,6 +3,7 @@ namespace ThreeBodySimulation.Data
     /// <summary>
     /// A class that represents the celestial body.
     /// </summary>
+    [System.Serializable]
     public class Body
     {
         /// <summary>

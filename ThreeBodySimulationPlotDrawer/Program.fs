@@ -1,4 +1,6 @@
 ﻿open PlotDrawer
+open Preset
+
 open Plotly.NET
 
 open ThreeBodySimulation.Data
@@ -7,6 +9,7 @@ open ThreeBodySimulation.Simulation.Solvers
 
 open System
 open System.Globalization
+open System.Text.Json
 
 let rec promptNumber () =
     match Double.TryParse(Console.ReadLine(), CultureInfo.InvariantCulture) with
@@ -35,13 +38,13 @@ let rec promptThreeNumbers () =
     else
         promptThreeNumbers ()
 
-let rec promptSolver () : IFixedStepBodiesSolver =
+let rec promptSolverMethod () : IFixedStepBodiesSolver =
     let input = Console.ReadLine()
 
     match input with
     | "yoshida4" -> Yoshida4Solver()
     | "rk4" -> RK4Solver()
-    | _ -> promptSolver()
+    | _ -> promptSolverMethod()
 
 let rec promptBody (index: int) =
     printfn ""
@@ -54,27 +57,69 @@ let rec promptBody (index: int) =
     let mass = promptPositiveNumber()
     Body(pos, vel, mass)
 
-let rec promptSimulation () =
+let promptSolver () = 
     printf "Enter solver (yoshida4/rk4): "
-    let solver = promptSolver()
-
-    printf "Enter gravitational constant G: "
-    let G = promptPositiveNumber()
-
-    let body1 = promptBody 1
-    let body2 = promptBody 2
-    let body3 = promptBody 3
-    printfn ""
+    let solver = promptSolverMethod()
 
     printf "Enter simulation step size: "
     let step = promptPositiveNumber()
     solver.Step <- step
+
+    solver
+
+let rec promptSimulation solver =
+    printf "Input preset path (leave empty to enter data manually): "
+    let inputPath = Console.ReadLine()
     
-    printfn ""
+    if String.IsNullOrWhiteSpace inputPath then
+        printfn ""
+        printf "Enter gravitational constant G: "
+        let G = promptPositiveNumber()
 
-    BodiesSimulator(body1, body2, body3, solver, G)
+        let body1 = promptBody 1
+        let body2 = promptBody 2
+        let body3 = promptBody 3
+        printfn ""
+    
+        printfn ""
 
-let sim = promptSimulation()
+        BodiesSimulator(body1, body2, body3, solver, G)
+    else
+        match loadPreset inputPath with
+        | Ok preset -> 
+            printfn "Preset loaded successfully"
+            BodiesSimulator(preset.Body1, preset.Body2, preset.Body3, solver, preset.G)
+        | Error msg -> 
+            fprintf stderr $"{msg}"
+            promptSimulation solver
+
+let copyBody (body : Body) = Body(body.Position, body.Velocity, body.Mass)
+
+let simToPreset (sim : BodiesSimulator) = {
+    Body1 = copyBody(sim.Body1)
+    Body2 = copyBody(sim.Body2)
+    Body3 = copyBody(sim.Body3)
+    G = sim.G
+}
+
+let rec promptPresetSave preset =
+    printf "Output preset path (leave empty to not save): "
+    let outputPath = Console.ReadLine()
+    
+    if not(String.IsNullOrWhiteSpace outputPath) then
+        match savePreset outputPath preset with
+        | Ok () -> printfn "Preset saved successfully."
+        | Error msg -> 
+            printfn "Error saving preset: %s" msg
+            promptPresetSave preset
+
+let solver = promptSolver()
+printfn ""
+
+let sim = promptSimulation solver
+printfn ""
+
+let preset = simToPreset sim
 
 printf "Enter simulation time: "
 let simTime = promptPositiveNumber()
@@ -87,3 +132,6 @@ printfn "Plotting..."
 
 chart |> Chart.show
 printfn "Done"
+printfn ""
+
+promptPresetSave preset
