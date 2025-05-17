@@ -89,6 +89,65 @@ namespace ThreeBodySimulation.Simulation
         }
 
         /// <summary>
+        /// Gets the differential equation function (on spans) with the given parameters.
+        /// </summary>
+        /// <param name="m1">The mass of the first body.</param>
+        /// <param name="m2">The mass of the second body.</param>
+        /// <param name="m3">The mass of the third body.</param>
+        /// <param name="g">The gravitational constant.</param>
+        /// <remarks>
+        /// The vector has this format: { x1, y1, z1, x2, ..., z3, vx1, vy1, vz1, ..., vz3 }.
+        /// </remarks>
+        /// <returns>
+        /// The differential equation function (on spans) that uses the given parameters.
+        /// </returns>
+        public static SpanDiffFunc GetSpanDiffFunction(double m1, double m2, double m3, double g)
+        {
+            return (t, y, result) =>
+            {
+                double x1 = y[0], y1 = y[1], z1 = y[2];
+                double x2 = y[3], y2 = y[4], z2 = y[5];
+                double x3 = y[6], y3 = y[7], z3 = y[8];
+
+                double vx1 = y[9], vy1 = y[10], vz1 = y[11];
+                double vx2 = y[12], vy2 = y[13], vz2 = y[14];
+                double vx3 = y[15], vy3 = y[16], vz3 = y[17];
+
+                double d12 = GetDistance(x1, y1, z1, x2, y2, z2);
+                double d13 = GetDistance(x1, y1, z1, x3, y3, z3);
+                double d23 = GetDistance(x2, y2, z2, x3, y3, z3);
+
+                // Velocities
+                result[0] = vx1;
+                result[1] = vy1;
+                result[2] = vz1;
+
+                result[3] = vx2;
+                result[4] = vy2;
+                result[5] = vz2;
+
+                result[6] = vx3;
+                result[7] = vy3;
+                result[8] = vz3;
+
+                // Accelerations - First body
+                result[9] = AxisMotionEquation(x1, x2, x3, d12, d13, m2, m3, g);
+                result[10] = AxisMotionEquation(y1, y2, y3, d12, d13, m2, m3, g);
+                result[11] = AxisMotionEquation(z1, z2, z3, d12, d13, m2, m3, g);
+
+                // Second body
+                result[12] = AxisMotionEquation(x2, x3, x1, d23, d12, m3, m1, g);
+                result[13] = AxisMotionEquation(y2, y3, y1, d23, d12, m3, m1, g);
+                result[14] = AxisMotionEquation(z2, z3, z1, d23, d12, m3, m1, g);
+
+                // Third body
+                result[15] = AxisMotionEquation(x3, x1, x2, d13, d23, m1, m2, g);
+                result[16] = AxisMotionEquation(y3, y1, y2, d13, d23, m1, m2, g);
+                result[17] = AxisMotionEquation(z3, z1, z2, d13, d23, m1, m2, g);
+            };
+        }
+
+        /// <summary>
         /// Extracts values from the bodies and places them into the vector 
         /// that can be used to solve the ode system.
         /// </summary>
@@ -110,6 +169,44 @@ namespace ThreeBodySimulation.Simulation
         }
 
         /// <summary>
+        /// Extracts values from the bodies and places them into the span 
+        /// that can be used to solve the ode system.
+        /// </summary>
+        /// <param name="body1">The first body.</param>
+        /// <param name="body2">The second body.</param>
+        /// <param name="body3">The third body.</param>
+        /// <param name="result">The vector that can be used to solve the ode system.</returns>
+        public static void InputToSpan(Body body1, Body body2, Body body3, Span<double> result)
+        {
+            if (result.Length < 18)
+                throw new ArgumentException("Insufficient size of the result span. At least 18 is expected.", nameof(result));
+
+            result[0] = body1.Position.X;
+            result[1] = body1.Position.Y;
+            result[2] = body1.Position.Z;
+
+            result[3] = body2.Position.X;
+            result[4] = body2.Position.Y;
+            result[5] = body2.Position.Z;
+
+            result[6] = body3.Position.X;
+            result[7] = body3.Position.Y;
+            result[8] = body3.Position.Z;
+
+            result[9] = body1.Velocity.X;
+            result[10] = body1.Velocity.Y;
+            result[11] = body1.Velocity.Z;
+
+            result[12] = body2.Velocity.X;
+            result[13] = body2.Velocity.Y;
+            result[14] = body2.Velocity.Z;
+
+            result[15] = body3.Velocity.X;
+            result[16] = body3.Velocity.Y;
+            result[17] = body3.Velocity.Z;
+        }
+
+        /// <summary>
         /// Extracts values from the <paramref name="vector"/> and applies them
         /// to each body.
         /// </summary>
@@ -117,7 +214,7 @@ namespace ThreeBodySimulation.Simulation
         /// <param name="body1">The first body.</param>
         /// <param name="body2">The second body.</param>
         /// <param name="body3">The third body.</param>
-        public static void ApplySolution(double[] vector, Body body1, Body body2, Body body3)
+        public static void ApplySolution(Span<double> vector, Body body1, Body body2, Body body3)
         {
             if (vector == null)
                 throw new ArgumentNullException(nameof(vector));
@@ -134,6 +231,19 @@ namespace ThreeBodySimulation.Simulation
             body1.Velocity = new BodyPosition(vector[9], vector[10], vector[11]);
             body2.Velocity = new BodyPosition(vector[12], vector[13], vector[14]);
             body3.Velocity = new BodyPosition(vector[15], vector[16], vector[17]);
+        }
+
+        /// <summary>
+        /// Extracts values from the <paramref name="vector"/> and applies them
+        /// to each body.
+        /// </summary>
+        /// <param name="vector">The solution vector.</param>
+        /// <param name="body1">The first body.</param>
+        /// <param name="body2">The second body.</param>
+        /// <param name="body3">The third body.</param>
+        public static void ApplySolution(double[] vector, Body body1, Body body2, Body body3)
+        {
+            ApplySolution(vector.AsSpan(), body1, body2, body3);
         }
     }
 }

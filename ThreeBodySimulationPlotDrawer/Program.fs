@@ -28,7 +28,7 @@ let body1 = Body(body1Pos, body1Vel, body1Mass)
 let body2 = Body(body2Pos, body2Vel, body2Mass)
 let body3 = Body(body3Pos, body3Vel, body3Mass)
 
-let solver = Yoshida4BodiesSolver() 
+let solver = RK4Solver() 
 solver.Step <- step
 
 let simulator = BodiesSimulator(body1, body2, body3, solver, G)
