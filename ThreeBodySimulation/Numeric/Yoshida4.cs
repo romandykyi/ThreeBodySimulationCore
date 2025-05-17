@@ -33,12 +33,12 @@ namespace ThreeBodySimulation.Numeric
             double[] c = { w1 / 2, (w0 + w1) / 2, (w0 + w1) / 2, w1 / 2 };
             double[] d = { w1, w0, w1 };
 
+            // Position update (half step)
+            for (int j = 0; j < n; j++)
+                result[j] += c[0] * step * result[j + n];
+
             for (int i = 0; i < 3; i++)
             {
-                // Position update (half step)
-                for (int j = 0; j < n; j++)
-                    result[j] += c[i] * step * result[j + n];
-
                 // Compute accelerations
                 double[] dydt = f(t, result);
 
@@ -98,12 +98,12 @@ namespace ThreeBodySimulation.Numeric
 
             Span<double> dydt = stackalloc double[y.Length];
 
+            // Position update (half step)
+            for (int j = 0; j < n; j++)
+                res[j] += c[0] * step * res[j + n];
+
             for (int i = 0; i < 3; i++)
             {
-                // Position update (half step)
-                for (int j = 0; j < n; j++)
-                    res[j] += c[i] * step * res[j + n];
-
                 // Compute accelerations
                 f(t, res, dydt);
 
