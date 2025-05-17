@@ -5,35 +5,76 @@ open ThreeBodySimulation.Data
 open ThreeBodySimulation.Simulation
 open ThreeBodySimulation.Simulation.Solvers
 
-let G = 1
+open System
+open System.Globalization
 
-let body1Pos = BodyPosition(0.9700436, -0.24308753, 0)
-let body1Vel = BodyPosition(0.466203685, 0.43236573, 2)
-let body1Mass = 10
+let rec promptNumber () =
+    match Double.TryParse(Console.ReadLine(), CultureInfo.InvariantCulture) with
+    | true, value -> value
+    | false, _ -> promptNumber()
 
-let body2Pos = BodyPosition(-0.9700436, 0.24308753, 0)
-let body2Vel = BodyPosition(0.466203685, 0.43236573, 0)
-let body2Mass = 10
+let rec promptPositiveNumber () =
+    let result = promptNumber()
+    if result > 0 then
+        result
+    else
+        promptPositiveNumber()
 
-let body3Pos = BodyPosition(0, 0, 0)
-let body3Vel = BodyPosition(-0.93240737, -0.86473146, 0)
-let body3Mass = 10
+let rec promptThreeNumbers () =
+    let input = Console.ReadLine()
+    let parts = input.Split([| ' ' |], StringSplitOptions.RemoveEmptyEntries)
+    
+    if parts.Length = 3 then
+        match 
+            Double.TryParse(parts.[0], CultureInfo.InvariantCulture), 
+            Double.TryParse(parts.[1], CultureInfo.InvariantCulture), 
+            Double.TryParse(parts.[2], CultureInfo.InvariantCulture) 
+        with
+        | (true, a), (true, b), (true, c) -> BodyPosition(a, b, c)
+        | _ -> promptThreeNumbers ()
+    else
+        promptThreeNumbers ()
 
-let startTime = 0
-let endTime = 1.5
+let rec promptSolver () : IFixedStepBodiesSolver =
+    let input = Console.ReadLine()
 
-let step = 0.00001
+    match input with
+    | "yoshida4" -> Yoshida4Solver()
+    | "rk4" -> RK4Solver()
+    | _ -> promptSolver()
 
-let body1 = Body(body1Pos, body1Vel, body1Mass)
-let body2 = Body(body2Pos, body2Vel, body2Mass)
-let body3 = Body(body3Pos, body3Vel, body3Mass)
+let rec promptBody (index: int) =
+    printf $"Enter position (x y z) for body {index}: "
+    let pos = promptThreeNumbers()
+    printf $"Enter velocity (vx vy vz) for body {index}: "
+    let vel = promptThreeNumbers()
+    printf $"Enter mass for body {index}: "
+    let mass = promptPositiveNumber()
+    Body(pos, vel, mass)
 
-let solver = Yoshida4Solver() 
-solver.Step <- step
+let rec promptSimulation () =
+    printf "Enter solver (yoshida4/rk4): "
+    let solver = promptSolver()
 
-let simulator = BodiesSimulator(body1, body2, body3, solver, G)
+    printf "Enter gravitational constant G: "
+    let G = promptPositiveNumber()
+
+    let body1 = promptBody 1
+    let body2 = promptBody 2
+    let body3 = promptBody 3
+
+    printf "Enter simulation step size: "
+    let step = promptPositiveNumber()
+    solver.Step <- step
+
+    BodiesSimulator(body1, body2, body3, solver, G)
+
+let sim = promptSimulation()
+
+printf "Enter simulation time: "
+let simTime = promptPositiveNumber()
 
 let options = { defaultSimPlotOptions with showCenterOfMass = true }
-let chart = plotSim simulator startTime endTime options
+let chart = plotSim sim 0.0 simTime options
 
 chart |> Chart.show
