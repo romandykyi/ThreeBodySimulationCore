@@ -3,7 +3,6 @@
 open ThreeBodySimulation.Simulation
 open ThreeBodySimulation.Simulation.Utils
 open Plotly.NET
-open Plotly.NET.StyleParam
 
 type SimPlotOptions = {
     showCenterOfMass : bool
@@ -37,6 +36,21 @@ let defaultSimPlotOptions = {
     centerOfMassColor = Color.fromHex "#888888"
 }
 
+let interpolateMarkerSize mass minMass maxMass minSize maxSize =
+    if minMass = maxMass then (minSize + maxSize) / 2
+    else
+        let t = (mass - minMass) / (maxMass - minMass)
+        int (round ((1.0 - t) * float minSize + t * float maxSize))
+
+let createBodyBubble name pos size color mass =
+    Chart.Bubble3D(
+        xyz = [pos],
+        sizes = [size],
+        Name = $"{name} (mass = {mass})",
+        MarkerColor = color,
+        ShowLegend = false
+    )
+
 let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOptions) = 
     let body1Positions = ResizeArray()
     let body2Positions = ResizeArray()
@@ -65,7 +79,13 @@ let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOp
             prevTime <- state.SimulationTime
 
     let n = body1Positions.Count
+    let m1, m2, m3 = simulator.Body1.Mass, simulator.Body2.Mass, simulator.Body3.Mass
+    let minMass = min (min m1 m2) m3
+    let maxMass = max (max m1 m2) m3
 
+    let size1 = interpolateMarkerSize m1 minMass maxMass options.minMarkerSize options.maxMarkerSize
+    let size2 = interpolateMarkerSize m2 minMass maxMass options.minMarkerSize options.maxMarkerSize
+    let size3 = interpolateMarkerSize m3 minMass maxMass options.minMarkerSize options.maxMarkerSize
 
     Chart.combine [
         if options.showCenterOfMass then 
@@ -75,8 +95,7 @@ let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOp
                 xyz = centersOfMass, 
                 Name="Center of Mass", 
                 LineColor = options.centerOfMassColor
-                ) |> 
-                Chart.withLineStyle(Dash = StyleParam.DrawingStyle.Dot)
+                ) |> Chart.withLineStyle(Dash = StyleParam.DrawingStyle.Dot)
 
             if options.showLastPosition then
                 yield Chart.Bubble3D(
@@ -85,55 +104,13 @@ let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOp
                     Name = "Center of Mass",
                     MarkerColor = options.centerOfMassColor,
                     ShowLegend = false)
-        
+
         yield Chart.Line3D(xyz = body1Positions, Name = "Body 1",  LineColor = options.body1Color)
         yield Chart.Line3D(xyz = body2Positions, Name = "Body 2",  LineColor = options.body2Color)
         yield Chart.Line3D(xyz = body3Positions, Name = "Body 3",  LineColor = options.body3Color)
 
         if options.showLastPosition then
-            let body1Pos = body1Positions[n - 1]
-            let body2Pos = body2Positions[n - 1]
-            let body3Pos = body3Positions[n - 1]
-            
-            // Adapt marker size to the mass
-            let m1 = simulator.Body1.Mass
-            let m2 = simulator.Body2.Mass
-            let m3 = simulator.Body3.Mass
-
-            let minMass = min (min m1 m2) m3
-            let maxMass = max (max m1 m2) m3
-
-            let t1 = (m1 - minMass) / (maxMass - minMass)
-            let t2 = (m2 - minMass) / (maxMass - minMass)
-            let t3 = (m3 - minMass) / (maxMass - minMass)
-
-            let minMarkerSize = double options.minMarkerSize
-            let maxMarkerSize = double options.maxMarkerSize
-            let markerSize1 = int(round((1.0 - t1) * minMarkerSize + t1 * maxMarkerSize))
-            let markerSize2 = int(round((1.0 - t2) * minMarkerSize + t2 * maxMarkerSize))
-            let markerSize3 = int(round((1.0 - t3) * minMarkerSize + t3 * maxMarkerSize))
-
-            yield Chart.Bubble3D(
-                xyz = [body1Pos],
-                sizes = [markerSize1],
-                Name = $"Body 1 (mass = {m1})",
-                MarkerColor = options.body1Color,
-                ShowLegend = false
-            )
-
-            yield Chart.Bubble3D(
-                xyz = [body2Pos],
-                sizes = [markerSize2],
-                Name = $"Body 2 (mass = {m2})",
-                MarkerColor = options.body2Color,
-                ShowLegend = false
-            )
-
-            yield Chart.Bubble3D(
-                xyz = [body3Pos],
-                sizes = [markerSize3],
-                Name = $"Body 3 (mass = {m3})",
-                MarkerColor = options.body3Color,
-                ShowLegend = false
-            )
+            yield createBodyBubble "Body 1" body1Positions[n - 1] size1 options.body1Color m1
+            yield createBodyBubble "Body 2" body2Positions[n - 1] size2 options.body2Color m2
+            yield createBodyBubble "Body 3" body3Positions[n - 1] size3 options.body3Color m3
     ]
