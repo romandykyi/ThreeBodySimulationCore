@@ -44,11 +44,13 @@ let rec promptSolver () : IFixedStepBodiesSolver =
     | _ -> promptSolver()
 
 let rec promptBody (index: int) =
-    printf $"Enter position (x y z) for body {index}: "
+    printfn ""
+    printfn $"Body #{index}"
+    printf $"Enter position (x y z) for body #{index}: "
     let pos = promptThreeNumbers()
-    printf $"Enter velocity (vx vy vz) for body {index}: "
+    printf $"Enter velocity (vx vy vz) for body #{index}: "
     let vel = promptThreeNumbers()
-    printf $"Enter mass for body {index}: "
+    printf $"Enter mass for body #{index}: "
     let mass = promptPositiveNumber()
     Body(pos, vel, mass)
 
@@ -62,10 +64,13 @@ let rec promptSimulation () =
     let body1 = promptBody 1
     let body2 = promptBody 2
     let body3 = promptBody 3
+    printfn ""
 
     printf "Enter simulation step size: "
     let step = promptPositiveNumber()
     solver.Step <- step
+    
+    printfn ""
 
     BodiesSimulator(body1, body2, body3, solver, G)
 
@@ -73,8 +78,12 @@ let sim = promptSimulation()
 
 printf "Enter simulation time: "
 let simTime = promptPositiveNumber()
+printfn ""
 
-let options = { defaultSimPlotOptions with showCenterOfMass = true }
+let options = { defaultSimPlotOptions with showProgress = true }
 let chart = plotSim sim 0.0 simTime options
+printfn ""
+printfn "Plotting..."
 
 chart |> Chart.show
+printfn "Done"

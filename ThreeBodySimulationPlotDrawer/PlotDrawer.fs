@@ -5,6 +5,8 @@ open ThreeBodySimulation.Simulation.Utils
 open Plotly.NET
 
 type SimPlotOptions = {
+    showProgress : bool
+
     showCenterOfMass : bool
     showLastPosition : bool
     visualizationStep : double
@@ -21,6 +23,8 @@ type SimPlotOptions = {
 }
 
 let defaultSimPlotOptions = {
+    showProgress = false
+
     showCenterOfMass = true
     showLastPosition = true
     visualizationStep = 0.01
@@ -77,6 +81,13 @@ let plotSim (simulator : BodiesSimulator) startTime endTime (options : SimPlotOp
             centersOfMass.Add (com.X, com.Y, com.Z)
 
             prevTime <- state.SimulationTime
+
+            if options.showProgress then
+                printf "\r%.2f/%.2f" state.SimulationTime endTime
+
+                
+    if options.showProgress then
+         printfn "\r%.2f/%.2f" endTime endTime
 
     let n = body1Positions.Count
     let m1, m2, m3 = simulator.Body1.Mass, simulator.Body2.Mass, simulator.Body3.Mass
