@@ -6,7 +6,7 @@ namespace ThreeBodySimulation.Benchmarks;
 
 public class ThreeBodySolversBenchmarks
 {
-    private readonly Consumer _consumer = new Consumer();
+    private readonly Consumer _consumer = new();
 
     [Params(1e-3, 1e-4, 1e-5)]
     public double Step { get; set; }
@@ -31,6 +31,7 @@ public class ThreeBodySolversBenchmarks
     }
 
     [Benchmark]
+    [Obsolete("Benchmark")]
     public void RK4()
     {
         RK4BodiesSolver solver = new() { Step = Step };

@@ -1,3 +1,4 @@
+using System;
 using ThreeBodySimulation.Data;
 using ThreeBodySimulation.Numeric;
 
@@ -6,6 +7,7 @@ namespace ThreeBodySimulation.Simulation.Solvers
     /// <summary>
     /// A solver that uses the Runge-Kutta (4th order) method.
     /// </summary>
+    [Obsolete("Consider using RK4Solver for better performance.")]
     public class RK4BodiesSolver : IFixedStepBodiesSolver
     {
         /// <summary>
