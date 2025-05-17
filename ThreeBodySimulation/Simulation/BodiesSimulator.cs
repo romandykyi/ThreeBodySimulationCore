@@ -15,17 +15,17 @@ namespace ThreeBodySimulation.Simulation
         public double G { get; set; }
 
         /// <summary>
-        /// Gets/sets the first body.
+        /// Gets the first body.
         /// </summary>
-        public Body Body1 { get; set; }
+        public Body Body1 { get; }
         /// <summary>
-        /// Gets/sets the second body.
+        /// Gets the second body.
         /// </summary>
-        public Body Body2 { get; set; }
+        public Body Body2 { get; }
         /// <summary>
-        /// Gets/sets the third body.
+        /// Gets the third body.
         /// </summary>
-        public Body Body3 { get; set; }
+        public Body Body3 { get; }
         /// <summary>
         /// Gets/sets the equation solver that is used.
         /// </summary>
