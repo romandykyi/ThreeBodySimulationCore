@@ -13,6 +13,14 @@ namespace ThreeBodySimulation.Simulation.Utils
         public Body Body3 { get; }
         public double G { get; }
 
+        public EnergyCalculator(BodiesSimulator simulator)
+        {
+            Body1 = simulator.Body1;
+            Body2 = simulator.Body2;
+            Body3 = simulator.Body3;
+            G = simulator.G;
+        }
+
         public EnergyCalculator(Body body1, Body body2, Body body3, double g = 1.0)
         {
             Body1 = body1;
