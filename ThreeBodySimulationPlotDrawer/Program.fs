@@ -9,7 +9,6 @@ open ThreeBodySimulation.Simulation.Solvers
 
 open System
 open System.Globalization
-open System.Text.Json
 
 let rec promptNumber () =
     match Double.TryParse(Console.ReadLine(), CultureInfo.InvariantCulture) with
