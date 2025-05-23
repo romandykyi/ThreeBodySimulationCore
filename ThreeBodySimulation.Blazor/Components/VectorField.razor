@@ -1,0 +1,29 @@
+﻿@using ThreeBodySimulation.Data
+@using MudBlazor
+
+<div class="ma-1">
+	@if (!string.IsNullOrEmpty(Title))
+	{
+		<MudText>@Title</MudText>
+	}
+	<MudGrid>
+		<MudItem xs="12" sm="6" md="4">
+			<MudNumericField T="double" Label="X" bind-Value="Position.X" />
+		</MudItem>
+		<MudItem xs="12" sm="6" md="4">
+			<MudNumericField T="double" Label="Y" bind-Value="Position.Y" />
+		</MudItem>
+		<MudItem xs="12" sm="6" md="4">
+			<MudNumericField T="double" Label="Z" bind-Value="Position.Z" />
+		</MudItem>
+	</MudGrid>
+</div>
+
+@code {
+	[Parameter]
+	public BodyPosition Position { get; set; } = BodyPosition.Zero;
+	[Parameter]
+	public EventCallback<BodyPosition> PositionChanged { get; set; }
+	[Parameter]
+	public string? Title { get; set; }
+}

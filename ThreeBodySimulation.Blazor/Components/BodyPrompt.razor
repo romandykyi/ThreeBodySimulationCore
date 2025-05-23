@@ -1,0 +1,31 @@
+﻿@using ThreeBodySimulation.Data
+@using ThreeBodySimulation.Blazor.Components
+@using MudBlazor
+
+<MudCard Class="ma-1">
+	<MudCardContent>
+		@if (!string.IsNullOrEmpty(Title))
+		{
+			<MudText Typo="Typo.h5">@Title</MudText>
+		}
+		<VectorField @bind-Position="Body.Position" Title="Position" />
+		<VectorField @bind-Position="Body.Velocity" Title="Velocity" />
+		<MudNumericField T="double" Label="Mass" @bind-Value="Body.Mass" Min="0" />
+	</MudCardContent>
+</MudCard>
+
+@code {
+	[Parameter]
+	public string? Title { get; set; }
+
+	[Parameter]
+	public Body Body { get; set; } = new(BodyPosition.Zero, BodyPosition.Zero, 1);
+	[Parameter]
+	public EventCallback<Body> BodyChanged { get; set; }
+
+	private async Task OnMassChanged(double value)
+	{
+		Body.Mass = value;
+		await BodyChanged.InvokeAsync(Body);
+	}
+}

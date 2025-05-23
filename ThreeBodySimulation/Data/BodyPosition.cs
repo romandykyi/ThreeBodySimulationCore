@@ -13,6 +13,8 @@ namespace ThreeBodySimulation.Data
         public double Y { get; set; }
         public double Z { get; set; }
 
+        public static BodyPosition Zero => new BodyPosition(0, 0, 0);
+
         public BodyPosition(double x, double y, double z) : this()
         {
             X = x; Y = y; Z = z;

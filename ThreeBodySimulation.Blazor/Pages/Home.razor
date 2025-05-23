@@ -1,48 +1,42 @@
 ﻿@page "/"
 @using MudBlazor
+@using ThreeBodySimulation.Data
+@using ThreeBodySimulation.Blazor.Components
 @inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
 
 <MudGrid>
-    <MudItem xs="12">
-        <MudPaper Class="pa-4">
-            <MudForm>
-                <MudTextField T="string" Label="Username" Required="true" RequiredError="User name is required!" />
-                <MudTextField T="string" Label="Email" Required="true" RequiredError="Email is required!" />
-                <MudTextField T="string" Label="Password" HelperText="Choose a strong password"
-                InputType="InputType.Password" Required="true"
-                RequiredError="Password is required!"/>
-                <MudTextField T="string"
-                Label="Password" HelperText="Repeat the password" InputType="InputType.Password"/>
-
-                <div class="d-flex align-center justify-space-between">
-                    <MudCheckBox T="bool" Required="true" RequiredError="You must agree" Label="I agree!"  />
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Register</MudButton>
-                </div>
-            </MudForm>   
-        </MudPaper>
-        <MudPaper Class="pa-4 mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="Test">Simulate</MudButton>
-        </MudPaper>
+    <MudItem xs="12" lg="6">
+        <BodyPrompt @bind-Body="body1" Title="Body 1" />
+    </MudItem>
+    <MudItem xs="12" lg="6">
+        <BodyPrompt @bind-Body="body2" Title="Body 2" />
+    </MudItem>
+    <MudItem xs="12" lg="6">
+        <BodyPrompt @bind-Body="body3" Title="Body 3" />
     </MudItem>
 </MudGrid>
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Test">Simulate</MudButton>
+
 <div id="plot"></div>
 
 @code {
-    public class Data
-    {
-        public int[] X { get; set; } 
-        public int[] Y { get; set; } 
-    }
+    private Body body1 { get; set; } = new(
+        new(-0.60288589811652, 0.059162128863347, 0), 
+        new(0.122913546623784, 0.747443868604908, 0),
+        1);
+    private Body body2 { get; set; } = new(
+        new(0.252709795391, 0.105825487222437, 0), 
+        new(-0.019325586404545, 1.369241993562101, 0),
+        1);
+    private Body body3 { get; set; } = new(
+        new(-0.355389016941814, 0.1038323764315145, 0),
+        new(-0.103587960218793, -2.11668586216882, 0),
+        1);
 
     private async Task Test()
     {
-        Data data = new()
-            {
-                X = [1, 2, 3, 4, 5],
-                Y = [1, 2, 4, 8, 16]
-            };
-        await JS.InvokeVoidAsync("test", data);
+        await JS.InvokeVoidAsync("alert", body1.Mass);
     }
 }
