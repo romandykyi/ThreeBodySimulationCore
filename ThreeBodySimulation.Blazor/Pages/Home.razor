@@ -2,6 +2,7 @@
 @using MudBlazor
 @using ThreeBodySimulation.Data
 @using ThreeBodySimulation.Blazor.Components
+@using ThreeBodySimulation.Blazor.Core
 @inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
@@ -16,12 +17,46 @@
     <MudItem xs="12" lg="6">
         <BodyPrompt @bind-Body="body3" Title="Body 3" />
     </MudItem>
+    <MudItem xs="12" lg="6">
+        <MudCard>
+            <MudCardContent>
+                <MudText Typo="Typo.h5">Simulation</MudText>
+                <MudSelect T="SolverType" Label="Solver" @bind-Value="solver">
+                    @foreach (SolverType solverType in Enum.GetValues(typeof(SolverType)))
+                    {
+                        <MudSelectItem T="SolverType" Value="@solverType">
+                            @solverType.ToHumanReadableString()
+                        </MudSelectItem>
+                    }
+                </MudSelect>
+                <MudNumericField T="double" Label="Step Size" @bind-Value="stepSize" Min="0" />
+                <MudNumericField T="double" Label="Simulation Time" @bind-Value="simulationTime" Min="0" />
+            </MudCardContent>
+            <MudCardActions>
+                <MudStack Spacing="1" Row="true">
+                    <MudButton Variant="Variant.Filled"
+                    StartIcon="@Icons.Material.Filled.PlayCircle"
+                    Color="Color.Primary" OnClick="Test">
+                        Simulate
+                    </MudButton>
+                    <MudButton Variant="Variant.Filled"
+                    StartIcon="@Icons.Material.Filled.FileOpen"
+                    Color="Color.Surface" OnClick="Test">
+                        JSON
+                    </MudButton>
+                </MudStack>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
 </MudGrid>
-<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Test">Simulate</MudButton>
 
 <div id="plot"></div>
 
 @code {
+    private SolverType solver;
+    private double stepSize;
+    private double simulationTime;
+
     private Body body1 { get; set; } = new(
         new(-0.60288589811652, 0.059162128863347, 0), 
         new(0.122913546623784, 0.747443868604908, 0),
