@@ -6,7 +6,7 @@ public class SimulationParams
 {
     public SolverType Solver { get; set; }
     public double G { get; set; } = 1;
-    public double StepSize { get; set; } = 0.00001;
+    public double StepSize { get; set; } = 0.0005;
     public double SimulationTime { get; set; } = 10;
 
     public Body Body1 { get; set; } = new(

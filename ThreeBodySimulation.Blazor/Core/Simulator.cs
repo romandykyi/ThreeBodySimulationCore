@@ -7,7 +7,7 @@ namespace ThreeBodySimulation.Blazor.Core;
 
 public class Simulator(SimulationParams simulationParams)
 {
-    private const double updateRate = 0.1;
+    private const double updateRate = 0.125;
     public readonly SimulationParams SimulationParams = simulationParams;
 
     private static Body CopyBody(Body body)
@@ -15,7 +15,8 @@ public class Simulator(SimulationParams simulationParams)
         return new Body(body.Position, body.Velocity, body.Mass);
     }
 
-    public SimulationResult Run(IProgress<double> progress, double visualizationStep = 0.01)
+    public async Task<SimulationResult?> RunAsync(IProgress<double> progress,
+        CancellationTokenSource cancellationTokenSource, double visualizationStep = 0.01)
     {
         IBodiesSolver solver = SimulationParams.Solver switch
         {
@@ -37,6 +38,8 @@ public class Simulator(SimulationParams simulationParams)
         double prevUpdateTime = double.NegativeInfinity;
         foreach (var state in states)
         {
+            if (cancellationTokenSource.IsCancellationRequested) return null;
+
             double timeStep = state.SimulationTime - prevTime;
             if (visualizationStep > 0.0 && timeStep < visualizationStep)
                 continue;
@@ -60,6 +63,7 @@ public class Simulator(SimulationParams simulationParams)
             {
                 prevUpdateTime = state.SimulationTime;
                 progress.Report(state.SimulationTime);
+                await Task.Delay(1);
             }
         }
 
