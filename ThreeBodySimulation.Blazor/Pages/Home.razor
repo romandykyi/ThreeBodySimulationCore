@@ -9,19 +9,19 @@
 
 <MudGrid>
     <MudItem xs="12" lg="6">
-        <BodyPrompt @bind-Body="body1" Title="Body 1" />
+        <BodyPrompt @bind-Body="simulationParams.Body1" Title="Body 1" />
     </MudItem>
     <MudItem xs="12" lg="6">
-        <BodyPrompt @bind-Body="body2" Title="Body 2" />
+        <BodyPrompt @bind-Body="simulationParams.Body2" Title="Body 2" />
     </MudItem>
     <MudItem xs="12" lg="6">
-        <BodyPrompt @bind-Body="body3" Title="Body 3" />
+        <BodyPrompt @bind-Body="simulationParams.Body3" Title="Body 3" />
     </MudItem>
     <MudItem xs="12" lg="6">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h5">Simulation</MudText>
-                <MudSelect T="SolverType" Label="Solver" @bind-Value="solver">
+                <MudSelect T="SolverType" Label="Solver" @bind-Value="simulationParams.Solver">
                     @foreach (SolverType solverType in Enum.GetValues(typeof(SolverType)))
                     {
                         <MudSelectItem T="SolverType" Value="@solverType">
@@ -29,8 +29,8 @@
                         </MudSelectItem>
                     }
                 </MudSelect>
-                <MudNumericField T="double" Label="Step Size" @bind-Value="stepSize" Min="0" />
-                <MudNumericField T="double" Label="Simulation Time" @bind-Value="simulationTime" Min="0" />
+                <MudNumericField T="double" Label="Step Size" @bind-Value="simulationParams.StepSize" Min="1e-12" />
+                <MudNumericField T="double" Label="Simulation Time" @bind-Value="simulationParams.SimulationTime" Min="0.1" />
             </MudCardContent>
             <MudCardActions>
                 <MudStack Spacing="1" Row="true">
@@ -53,25 +53,10 @@
 <div id="plot"></div>
 
 @code {
-    private SolverType solver;
-    private double stepSize;
-    private double simulationTime;
-
-    private Body body1 { get; set; } = new(
-        new(-0.60288589811652, 0.059162128863347, 0), 
-        new(0.122913546623784, 0.747443868604908, 0),
-        1);
-    private Body body2 { get; set; } = new(
-        new(0.252709795391, 0.105825487222437, 0), 
-        new(-0.019325586404545, 1.369241993562101, 0),
-        1);
-    private Body body3 { get; set; } = new(
-        new(-0.355389016941814, 0.1038323764315145, 0),
-        new(-0.103587960218793, -2.11668586216882, 0),
-        1);
+    private SimulationParams simulationParams = new();
 
     private async Task Test()
     {
-        await JS.InvokeVoidAsync("alert", body1.Mass);
+        await JS.InvokeVoidAsync("alert", simulationParams.Body1.Mass);
     }
 }
