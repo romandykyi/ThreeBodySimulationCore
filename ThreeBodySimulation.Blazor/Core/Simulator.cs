@@ -16,7 +16,7 @@ public class Simulator(SimulationParams simulationParams)
     }
 
     public async Task<SimulationResult?> RunAsync(IProgress<double> progress,
-        CancellationTokenSource cancellationTokenSource, double visualizationStep = 0.01)
+        CancellationToken cancellationToken, double visualizationStep = 0.01)
     {
         IBodiesSolver solver = SimulationParams.Solver switch
         {
@@ -38,7 +38,7 @@ public class Simulator(SimulationParams simulationParams)
         double prevUpdateTime = double.NegativeInfinity;
         foreach (var state in states)
         {
-            if (cancellationTokenSource.IsCancellationRequested) return null;
+            if (cancellationToken.IsCancellationRequested) return null;
 
             double timeStep = state.SimulationTime - prevTime;
             if (visualizationStep > 0.0 && timeStep < visualizationStep)

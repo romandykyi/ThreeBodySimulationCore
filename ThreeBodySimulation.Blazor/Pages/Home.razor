@@ -91,9 +91,9 @@
         _cancellationTokenSource = new();
         loadedSimulationTime = 0;
 
-        await simulator.RunAsync(progress, _cancellationTokenSource);
+        await simulator.RunAsync(progress, _cancellationTokenSource.Token);
 
-        //await JS.InvokeVoidAsync("renderThreeBodyAnimation3D", simulationParams.Body1.Mass);
+        //await JS.InvokeVoidAsync("renderThreeBodyAnimation3D", simulationParams.Body1.Mass,);
         isLoadingSimulation = false;
 
         progress.ProgressChanged -= OnProgressChanged;
