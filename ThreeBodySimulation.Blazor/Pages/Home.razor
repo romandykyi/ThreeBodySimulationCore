@@ -29,6 +29,7 @@
                         </MudSelectItem>
                     }
                 </MudSelect>
+                <MudNumericField T="double" Label="Gravitational Constant" @bind-Value="simulationParams.G" Min="1e-12" />
                 <MudNumericField T="double" Label="Step Size" @bind-Value="simulationParams.StepSize" Min="1e-12" />
                 <MudNumericField T="double" Label="Simulation Time" @bind-Value="simulationParams.SimulationTime" Min="0.1" />
             </MudCardContent>
@@ -36,7 +37,7 @@
                 <MudStack Spacing="1" Row="true">
                     <MudButton Variant="Variant.Filled"
                     StartIcon="@Icons.Material.Filled.PlayCircle"
-                    Color="Color.Primary" OnClick="Test">
+                    Color="Color.Primary" OnClick="Test" Disabled="@isLoadingSimulation">
                         Simulate
                     </MudButton>
                     <MudButton Variant="Variant.Filled"
@@ -50,13 +51,22 @@
     </MudItem>
 </MudGrid>
 
+@if (isLoadingSimulation)
+{
+    <MudProgressLinear Color="Color.Info" Buffer="true" Value="@progress" Class="my-7" />
+}
+
 <div id="plot"></div>
 
 @code {
-    private SimulationParams simulationParams = new();
+    private bool isLoadingSimulation { get; set; } = false;
+    private double progress { get; set; } = 55.5;
+    private SimulationParams simulationParams { get; set; } = new();
 
     private async Task Test()
     {
-        await JS.InvokeVoidAsync("alert", simulationParams.Body1.Mass);
+        isLoadingSimulation = true;
+        await JS.InvokeVoidAsync("renderThreeBodyAnimation3D", simulationParams.Body1.Mass);
+        isLoadingSimulation = false;
     }
 }
