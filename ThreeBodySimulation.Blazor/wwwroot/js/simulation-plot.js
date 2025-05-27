@@ -21,6 +21,41 @@
     const yRange = [min(allY) - margin, max(allY) + margin];
     const zRange = [min(allZ) - margin, max(allZ) + margin];
 
+    // Initialize trail traces with empty arrays and mode 'lines'
+    const body1Trail = {
+        x: [],
+        y: [],
+        z: [],
+        showlegend: false,
+        mode: 'lines',
+        type: 'scatter3d',
+        name: 'Body 1 Trail',
+        line: { color: '#0074D9', width: 2 }
+    };
+
+    const body2Trail = {
+        x: [],
+        y: [],
+        z: [],
+        showlegend: false,
+        mode: 'lines',
+        type: 'scatter3d',
+        name: 'Body 2 Trail',
+        line: { color: '#FF851B', width: 2 }
+    };
+
+    const body3Trail = {
+        x: [],
+        y: [],
+        z: [],
+        showlegend: false,
+        mode: 'lines',
+        type: 'scatter3d',
+        name: 'Body 3 Trail',
+        line: { color: '#2ECC40', width: 2 }
+    };
+
+    // Markers for bodies
     const body1Trace = {
         x: [],
         y: [],
@@ -58,32 +93,91 @@
         mode: 'markers',
         type: 'scatter3d',
         name: 'Center of Mass',
-        marker: { size: 3, color: '#888888' }
+        marker: {
+            size: 6,
+            color: '#888888'
+        }
+    };
+    const centerOfMassTrail = {
+        x: [],
+        y: [],
+        z: [],
+        showlegend: false,
+        mode: 'lines',
+        type: 'scatter3d',
+        name: 'Center of Mass Trail',
+        line: { color: '#888888', width: 2, dash: 'dot' }  // dotted line style for COM trail
     };
 
+    // Prepare trails
     const animationFrames = frames.map((frame, index) => {
+        // Trails accumulate all previous positions up to current frame
+        const trailX1 = frames.slice(0, index + 1).map(f => f.body1.x);
+        const trailY1 = frames.slice(0, index + 1).map(f => f.body1.y);
+        const trailZ1 = frames.slice(0, index + 1).map(f => f.body1.z);
+
+        const trailX2 = frames.slice(0, index + 1).map(f => f.body2.x);
+        const trailY2 = frames.slice(0, index + 1).map(f => f.body2.y);
+        const trailZ2 = frames.slice(0, index + 1).map(f => f.body2.z);
+
+        const trailX3 = frames.slice(0, index + 1).map(f => f.body3.x);
+        const trailY3 = frames.slice(0, index + 1).map(f => f.body3.y);
+        const trailZ3 = frames.slice(0, index + 1).map(f => f.body3.z);
+
+        const trailXCOM = frames.slice(0, index + 1).map(f => f.centerOfMass.x);
+        const trailYCOM = frames.slice(0, index + 1).map(f => f.centerOfMass.y);
+        const trailZCOM = frames.slice(0, index + 1).map(f => f.centerOfMass.z);
+
         return {
             name: index.toString(),
             data: [
+                // Body 1 marker
                 {
                     x: [frame.body1.x],
                     y: [frame.body1.y],
                     z: [frame.body1.z]
                 },
+                // Body 2 marker
                 {
                     x: [frame.body2.x],
                     y: [frame.body2.y],
                     z: [frame.body2.z]
                 },
+                // Body 3 marker
                 {
                     x: [frame.body3.x],
                     y: [frame.body3.y],
                     z: [frame.body3.z]
                 },
+                // Center of Mass marker
                 {
                     x: [frame.centerOfMass.x],
                     y: [frame.centerOfMass.y],
                     z: [frame.centerOfMass.z]
+                },
+                // Body 1 trail line
+                {
+                    x: trailX1,
+                    y: trailY1,
+                    z: trailZ1
+                },
+                // Body 2 trail line
+                {
+                    x: trailX2,
+                    y: trailY2,
+                    z: trailZ2
+                },
+                // Body 3 trail line
+                {
+                    x: trailX3,
+                    y: trailY3,
+                    z: trailZ3
+                },
+                // Center of Mass trail line
+                {
+                    x: trailXCOM,
+                    y: trailYCOM,
+                    z: trailZCOM
                 }
             ]
         };
@@ -96,11 +190,7 @@
             yaxis: { title: 'Y', range: yRange },
             zaxis: { title: 'Z', range: zRange },
             aspectmode: 'manual',
-            aspectratio: {
-                x: 1,
-                y: 1,
-                z: 1
-            }
+            aspectratio: { x: 1, y: 1, z: 1 }
         },
         updatemenus: [{
             type: 'buttons',
@@ -129,8 +219,17 @@
         margin: { l: 0, r: 0, b: 0, t: 30 }
     };
 
-    Plotly.newPlot('three-body-plot', [body1Trace, body2Trace, body3Trace, centerOfMassTrace], layout)
-        .then(() => {
-            Plotly.addFrames('three-body-plot', animationFrames);
-        });
+    // Initial traces: bodies + center of mass + trails (empty trails initially)
+    Plotly.newPlot('three-body-plot', [
+        body1Trace,
+        body2Trace,
+        body3Trace,
+        centerOfMassTrace,
+        body1Trail,
+        body2Trail,
+        body3Trail,
+        centerOfMassTrail
+    ], layout).then(() => {
+        Plotly.addFrames('three-body-plot', animationFrames);
+    });
 }
