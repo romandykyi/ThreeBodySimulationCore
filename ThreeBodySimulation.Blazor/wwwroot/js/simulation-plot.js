@@ -109,7 +109,7 @@
         line: { color: '#888888', width: 2, dash: 'dot' }  // dotted line style for COM trail
     };
 
-    // Prepare trails
+    // Prepare frames for animation
     const animationFrames = frames.map((frame, index) => {
         // Trails accumulate all previous positions up to current frame
         const trailX1 = frames.slice(0, index + 1).map(f => f.body1.x);
@@ -183,6 +183,42 @@
         };
     });
 
+    const stepTime = 0.1;
+    const sliderSteps = [];
+
+    let nextStepTime = 0;
+    for (let i = 0; i < frames.length; i++) {
+        const frameTime = frames[i].time;
+
+        if (frameTime >= nextStepTime) {
+            sliderSteps.push({
+                method: 'animate',
+                label: frameTime.toFixed(1),
+                args: [[i.toString()], {
+                    mode: 'immediate',
+                    frame: { duration: 0, redraw: true },
+                    transition: { duration: 0 }
+                }]
+            });
+
+            nextStepTime += stepTime;
+        }
+    }
+
+    // Ensure the final frame is added if not already
+    const lastFrameTime = frames[frames.length - 1].time;
+    if (sliderSteps.length === 0 || parseFloat(sliderSteps[sliderSteps.length - 1].label) < lastFrameTime) {
+        sliderSteps.push({
+            method: 'animate',
+            label: lastFrameTime.toFixed(1),
+            args: [[(frames.length - 1).toString()], {
+                mode: 'immediate',
+                frame: { duration: 0, redraw: true },
+                transition: { duration: 0 }
+            }]
+        });
+    }
+
     const layout = {
         title: 'Three-Body Simulation',
         scene: {
@@ -195,6 +231,10 @@
         updatemenus: [{
             type: 'buttons',
             showactive: false,
+            y: 0,
+            x: 1.05,
+            xanchor: 'left',
+            yanchor: 'bottom',
             buttons: [
                 {
                     label: 'Play',
@@ -216,6 +256,16 @@
                 }
             ]
         }],
+        sliders: [{
+            pad: { t: 30 },
+            currentvalue: {
+                visible: true,
+                prefix: 'Simulation Time: ',
+                xanchor: 'right',
+                font: { size: 14, color: '#666' }
+            },
+            steps: sliderSteps
+        }],
         margin: { l: 0, r: 0, b: 0, t: 30 }
     };
 
@@ -231,5 +281,12 @@
         centerOfMassTrail
     ], layout).then(() => {
         Plotly.addFrames('three-body-plot', animationFrames);
+
+        // Autoplay after initialization
+        Plotly.animate('three-body-plot', null, {
+            fromcurrent: true,
+            frame: { duration: interval, redraw: true },
+            transition: { duration: 0 }
+        });
     });
 }

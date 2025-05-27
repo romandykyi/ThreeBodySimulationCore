@@ -9,4 +9,5 @@ public class SimulationFrame
     public BodyPosition Body2 { get; set; }
     public BodyPosition Body3 { get; set; }
     public BodyPosition CenterOfMass { get; set; }
+    public double Time { get; set; }
 }

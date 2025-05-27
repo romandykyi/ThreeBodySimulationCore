@@ -54,7 +54,8 @@ public class Simulator(SimulationParams simulationParams)
                 Body1 = state.Body1Position,
                 Body2 = state.Body2Position,
                 Body3 = state.Body3Position,
-                CenterOfMass = com
+                CenterOfMass = com,
+                Time = state.SimulationTime
             };
             frames.Add(frame);
 
