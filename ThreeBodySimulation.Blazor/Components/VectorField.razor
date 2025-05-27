@@ -8,22 +8,54 @@
 	}
 	<MudGrid>
 		<MudItem xs="12" sm="6" md="4">
-			<MudNumericField T="double" Label="X" bind-Value="Position.X" />
+			<MudNumericField T="double" Label="X" Value="@x" ValueChanged="OnXChanged" />
 		</MudItem>
 		<MudItem xs="12" sm="6" md="4">
-			<MudNumericField T="double" Label="Y" bind-Value="Position.Y" />
+			<MudNumericField T="double" Label="Y" Value="@y" ValueChanged="OnYChanged" />
 		</MudItem>
 		<MudItem xs="12" sm="6" md="4">
-			<MudNumericField T="double" Label="Z" bind-Value="Position.Z" />
+			<MudNumericField T="double" Label="Z" Value="@z" ValueChanged="OnZChanged" />
 		</MudItem>
 	</MudGrid>
 </div>
 
 @code {
+	private double x;
+	private double y;
+	private double z;
+
 	[Parameter]
 	public BodyPosition Position { get; set; } = BodyPosition.Zero;
 	[Parameter]
 	public EventCallback<BodyPosition> PositionChanged { get; set; }
 	[Parameter]
 	public string? Title { get; set; }
+
+	protected override void OnParametersSet()
+	{
+		x = Position.X;
+		y = Position.Y;
+		z = Position.Z;
+		StateHasChanged();
+	}
+
+	private async Task OnXChanged(double value)
+	{
+		Position = new(value, Position.Y, Position.Z);
+		await PositionChanged.InvokeAsync(Position);
+	}
+
+
+	private async Task OnYChanged(double value)
+	{
+		Position = new(Position.X, value, Position.Z);
+		await PositionChanged.InvokeAsync(Position);
+	}
+
+
+	private async Task OnZChanged(double value)
+	{
+		Position = new(Position.X, Position.Y, value);
+		await PositionChanged.InvokeAsync(Position);
+	}
 }

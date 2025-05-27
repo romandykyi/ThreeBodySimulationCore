@@ -7,7 +7,7 @@ namespace ThreeBodySimulation.Blazor.Core;
 
 public class Simulator(SimulationParams simulationParams)
 {
-    private const double updateRate = 0.125;
+    private const double updateRate = 1;
     public readonly SimulationParams SimulationParams = simulationParams;
 
     private static Body CopyBody(Body body)
