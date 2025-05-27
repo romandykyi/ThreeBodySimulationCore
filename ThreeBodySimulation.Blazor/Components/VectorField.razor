@@ -8,13 +8,16 @@
 	}
 	<MudGrid>
 		<MudItem xs="12" sm="6" md="4">
-			<MudNumericField T="double" Label="X" Value="@x" ValueChanged="OnXChanged" />
+			<MudNumericField T="double" Label="X" Value="@x"
+							Disabled="@Disabled" ValueChanged="OnXChanged" />
 		</MudItem>
 		<MudItem xs="12" sm="6" md="4">
-			<MudNumericField T="double" Label="Y" Value="@y" ValueChanged="OnYChanged" />
+			<MudNumericField T="double" Label="Y" Value="@y"
+							 Disabled="@Disabled" ValueChanged="OnYChanged" />
 		</MudItem>
 		<MudItem xs="12" sm="6" md="4">
-			<MudNumericField T="double" Label="Z" Value="@z" ValueChanged="OnZChanged" />
+			<MudNumericField T="double" Label="Z" Value="@z"
+							 Disabled="@Disabled" ValueChanged="OnZChanged" />
 		</MudItem>
 	</MudGrid>
 </div>
@@ -25,11 +28,14 @@
 	private double z;
 
 	[Parameter]
+	public string? Title { get; set; }
+	[Parameter]
+	public bool Disabled { get; set; }
+
+	[Parameter]
 	public BodyPosition Position { get; set; } = BodyPosition.Zero;
 	[Parameter]
 	public EventCallback<BodyPosition> PositionChanged { get; set; }
-	[Parameter]
-	public string? Title { get; set; }
 
 	protected override void OnParametersSet()
 	{

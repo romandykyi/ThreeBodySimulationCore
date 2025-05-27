@@ -9,19 +9,20 @@
 
 <MudGrid>
     <MudItem xs="12" lg="6">
-        <BodyPrompt @bind-Body="simulationParams.Body1" Title="Body 1" />
+        <BodyPrompt @bind-Body="simulationParams.Body1" Disabled="@isLoadingSimulation" Title="Body 1" />
     </MudItem>
     <MudItem xs="12" lg="6">
-        <BodyPrompt @bind-Body="simulationParams.Body2" Title="Body 2" />
+        <BodyPrompt @bind-Body="simulationParams.Body2" Disabled="@isLoadingSimulation" Title="Body 2" />
     </MudItem>
     <MudItem xs="12" lg="6">
-        <BodyPrompt @bind-Body="simulationParams.Body3" Title="Body 3" />
+        <BodyPrompt @bind-Body="simulationParams.Body3" Disabled="@isLoadingSimulation" Title="Body 3" />
     </MudItem>
     <MudItem xs="12" lg="6">
         <MudCard>
             <MudCardContent>
                 <MudText Typo="Typo.h5">Simulation</MudText>
-                <MudSelect T="SolverType" Label="Solver" @bind-Value="simulationParams.Solver">
+                <MudSelect T="SolverType" Label="Solver" @bind-Value="simulationParams.Solver"
+                           Disabled="@isLoadingSimulation">
                     @foreach (SolverType solverType in Enum.GetValues(typeof(SolverType)))
                     {
                         <MudSelectItem T="SolverType" Value="@solverType">
@@ -30,11 +31,14 @@
                     }
                 </MudSelect>
                 <MudNumericField T="double" Label="Gravitational Constant"
-                @bind-Value="simulationParams.G" Min="1e-12" />
-                <MudNumericField T="double" Label="Step Size" 
-                @bind-Value="simulationParams.StepSize" Min="1e-6" />
+                                Disabled="@isLoadingSimulation" 
+                                @bind-Value="simulationParams.G" Min="1e-12" />
+                <MudNumericField T="double" Label="Step Size"
+                                 Disabled="@isLoadingSimulation"
+                                 @bind-Value="simulationParams.StepSize" Min="1e-6" />
                 <MudNumericField T="double" Label="Simulation Time"
-                @bind-Value="simulationParams.SimulationTime" Min="0.1" />
+                                 Disabled="@isLoadingSimulation"
+                                 @bind-Value="simulationParams.SimulationTime" Min="0.1" />
             </MudCardContent>
             <MudCardActions>
                 <MudStack Spacing="1" Row="true">
