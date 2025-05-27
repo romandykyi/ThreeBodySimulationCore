@@ -71,18 +71,15 @@
 
 @if (isLoadingSimulation)
 {
-    <MudProgressLinear Color="Color.Info" Buffer="false" Class="my-7"
-    Min="0" Max="100"
-    Value="@(loadedSimulationTime / @simulationParams.SimulationTime * 100.0)"  />
+	<div class="overlay" />
 }
 
-<div id="three-body-plot" style="width:100%;height:600px;"></div>
+<div id="three-body-plot" class="ma-2" style="width:100%;height:600px;"></div>
 
 @code {
     private CancellationTokenSource _cancellationTokenSource = null!;
 
     private bool isLoadingSimulation { get; set; } = false;
-    private double loadedSimulationTime { get; set; } = 0.0;
     private SimulationParams simulationParams { get; set; } = new();
 
     protected override void OnParametersSet()
@@ -93,14 +90,11 @@
     private async Task LoadSimulation()
     {
         isLoadingSimulation = true;
-        Progress<double> progress = new();
-        progress.ProgressChanged += OnProgressChanged;
 
         Simulator simulator = new(simulationParams);
         _cancellationTokenSource = new();
-        loadedSimulationTime = 0;
 
-        var simResult = await simulator.RunAsync(progress, _cancellationTokenSource.Token);
+        var simResult = await simulator.RunAsync(_cancellationTokenSource.Token);
 
         if (!_cancellationTokenSource.IsCancellationRequested)
         {
@@ -111,18 +105,11 @@
         }
         isLoadingSimulation = false;
 
-        progress.ProgressChanged -= OnProgressChanged;
         _cancellationTokenSource.Dispose();
     }
 
     private async Task CancelSimulation()
     {
         await _cancellationTokenSource.CancelAsync();
-    }
-
-    private void OnProgressChanged(object? sender, double newProgress)
-    {
-        loadedSimulationTime = newProgress;
-        StateHasChanged();
     }
 }
