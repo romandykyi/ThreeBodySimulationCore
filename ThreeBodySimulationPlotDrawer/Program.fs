@@ -66,30 +66,53 @@ let promptSolver () =
 
     solver
 
+let printVector (v : BodyPosition) =
+    printfn $"{v.X} {v.Y} {v.Z}"
+    
+let printBody (index, body : Body) = 
+    printfn ""
+    printfn $"Body #{index}"
+
+    printf("Position: ")
+    printVector body.Position
+    printf("Velocity: ")
+    printVector body.Velocity
+    printf("Mass: ")
+    printfn $"{body.Mass}"
+
+let printSimulation (sim : BodiesSimulator) =
+    printfn $"Gravitational constant (G): {sim.G}"
+
+    printBody(1, sim.Body1)
+    printBody(2, sim.Body2)
+    printBody(3, sim.Body3)
+    printfn ""
+
 let rec promptSimulation solver =
     printf "Input preset path (leave empty to enter data manually): "
     let inputPath = Console.ReadLine()
     
     if String.IsNullOrWhiteSpace inputPath then
         printfn ""
-        printf "Enter gravitational constant G: "
+        printf "Enter gravitational constant (G): "
         let G = promptPositiveNumber()
 
         let body1 = promptBody 1
         let body2 = promptBody 2
         let body3 = promptBody 3
         printfn ""
-    
         printfn ""
 
         BodiesSimulator(body1, body2, body3, solver, G)
     else
         match loadPreset inputPath with
         | Ok preset -> 
-            printfn "Preset loaded successfully"
-            BodiesSimulator(preset.Body1, preset.Body2, preset.Body3, solver, preset.G)
+            printfn "Preset loaded successfully:"
+            let simulator = BodiesSimulator(preset.Body1, preset.Body2, preset.Body3, solver, preset.G)
+            printSimulation simulator
+            simulator
         | Error msg -> 
-            fprintf stderr $"{msg}"
+            fprintfn stderr $"{msg}"
             promptSimulation solver
 
 let copyBody (body : Body) = Body(body.Position, body.Velocity, body.Mass)
