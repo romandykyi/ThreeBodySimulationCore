@@ -1,4 +1,4 @@
-﻿function renderThreeBodyAnimation3D(simulationResult) {
+﻿function renderThreeBodyAnimation3D(plotId, simulationResult) {
     const frames = simulationResult.simulationFrames;
     const interval = simulationResult.interval * 1000; // seconds -> ms
 
@@ -270,7 +270,7 @@
     };
 
     // Initial traces: bodies + center of mass + trails (empty trails initially)
-    Plotly.newPlot('three-body-plot', [
+    Plotly.newPlot(plotId, [
         body1Trace,
         body2Trace,
         body3Trace,
@@ -280,10 +280,10 @@
         body3Trail,
         centerOfMassTrail
     ], layout).then(() => {
-        Plotly.addFrames('three-body-plot', animationFrames);
+        Plotly.addFrames(plotId, animationFrames);
 
         // Autoplay after initialization
-        Plotly.animate('three-body-plot', null, {
+        Plotly.animate(plotId, null, {
             fromcurrent: true,
             frame: { duration: interval, redraw: true },
             transition: { duration: 0 }

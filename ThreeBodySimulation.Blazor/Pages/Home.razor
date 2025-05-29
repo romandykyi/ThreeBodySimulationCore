@@ -22,7 +22,7 @@
             <MudCardContent>
                 <MudText Typo="Typo.h5">Simulation</MudText>
                 <MudSelect T="SolverType" Label="Solver" @bind-Value="simulationParams.Solver"
-                           Disabled="@isLoadingSimulation">
+                Disabled="@isLoadingSimulation">
                     @foreach (SolverType solverType in Enum.GetValues(typeof(SolverType)))
                     {
                         <MudSelectItem T="SolverType" Value="@solverType">
@@ -31,14 +31,14 @@
                     }
                 </MudSelect>
                 <MudNumericField T="double" Label="Gravitational Constant"
-                                Disabled="@isLoadingSimulation" 
-                                @bind-Value="simulationParams.G" Min="1e-12" />
+                Disabled="@isLoadingSimulation" 
+                @bind-Value="simulationParams.G" Min="1e-12" />
                 <MudNumericField T="double" Label="Step Size"
-                                 Disabled="@isLoadingSimulation"
-                                 @bind-Value="simulationParams.StepSize" Min="1e-6" />
+                Disabled="@isLoadingSimulation"
+                @bind-Value="simulationParams.StepSize" Min="1e-6" />
                 <MudNumericField T="double" Label="Simulation Time"
-                                 Disabled="@isLoadingSimulation"
-                                 @bind-Value="simulationParams.SimulationTime" Min="0.1" />
+                Disabled="@isLoadingSimulation"
+                @bind-Value="simulationParams.SimulationTime" Min="0.1" />
             </MudCardContent>
             <MudCardActions>
                 <MudStack Spacing="1" Row="true">
@@ -68,25 +68,30 @@
         </MudCard>
     </MudItem>
     <MudItem xs="12">
-        <div id="three-body-plot" style="width:98%;height:600px;"></div>
+        <div id="@plotId" style="width:98%;height:600px;"></div>
     </MudItem>
 </MudGrid>
 
 @if (isLoadingSimulation)
 {
-	<div class="overlay" />
+    <div class="overlay" />
 }
 
 
 @code {
+    private const string plotId = "three-body-plot";
+
     private CancellationTokenSource _cancellationTokenSource = null!;
 
     private bool isLoadingSimulation { get; set; } = false;
     private SimulationParams simulationParams { get; set; } = new();
 
-    protected override void OnParametersSet()
+    protected override void OnAfterRender(bool firstRender)
     {
-        StateHasChanged();
+        if (firstRender)
+        {
+            StateHasChanged();
+        }
     }
 
     private async Task LoadSimulation()
@@ -103,9 +108,12 @@
             await JS.InvokeVoidAsync(
                 "renderThreeBodyAnimation3D",
                 _cancellationTokenSource.Token,
+                plotId,
                 simResult);
         }
         isLoadingSimulation = false;
+
+        await JS.InvokeVoidAsync("scrollToElementId", plotId);
 
         _cancellationTokenSource.Dispose();
     }
