@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ThreeBodySimulation.Blazor.Core;
+namespace ThreeBodySimulation.Blazor.Core.Extensions;
 
 public static class EnumExtensions
 {
