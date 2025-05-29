@@ -1,0 +1,92 @@
+﻿@using MudBlazor
+@using ThreeBodySimulation.Blazor.Core
+@using ThreeBodySimulation.Blazor.Core.Extensions
+@using System.Text.Json
+
+<MudOverlay @bind-Visible="@Visible" AutoClose="false" DarkBackground>
+	<MudGrid Justify="Justify.Center">
+		<MudItem xs="12" md="11" lg="10" xl="9">
+			<MudCard Style="width:100%">
+				<MudCardContent>
+					<MudTextField T="string" Label="JSON Parameters" Variant="Variant.Outlined"
+					TextFieldType="TextFieldType.Multiline" Lines="15"
+					@bind-Text="text" FullWidth="true" />
+				</MudCardContent>
+				<MudCardActions>
+					<MudStack Row="true">
+						<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="Apply">
+							Apply
+						</MudButton>
+						<MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="Cancel">
+							Cancel
+						</MudButton>
+					</MudStack>
+				</MudCardActions>
+			</MudCard>
+		</MudItem>
+	</MudGrid>
+</MudOverlay>
+
+@code {
+
+	private readonly JsonSerializerOptions jsonOptions = new()
+	{
+		AllowTrailingCommas = true,
+		PropertyNameCaseInsensitive = true,
+		WriteIndented = true
+	};
+
+	private bool _visible = false;
+
+	private string text { get; set; } = "";
+
+	[Parameter]
+	public bool Visible 
+	{
+		get => _visible;
+		set
+		{
+			if (_visible == value) return;
+
+			_visible = value;
+
+			if (_visible)
+			{
+				text = JsonSerializer.Serialize(Params, jsonOptions);
+				StateHasChanged();
+			}
+		}
+	}
+	[Parameter]
+	public EventCallback<bool> VisibleChanged { get; set; }
+
+	[Parameter]
+	public SimulationParams Params { get; set; }
+	[Parameter]
+	public EventCallback<SimulationParams> ParamsChanged { get; set; }
+
+	private async Task Apply()
+	{
+		SimulationParams newParams = JsonSerializer.Deserialize<SimulationParams>(text);
+
+		Params.G = newParams.G;
+		Params.Solver = newParams.Solver;
+		Params.StepSize = newParams.StepSize;
+		Params.SimulationTime = newParams.SimulationTime;
+
+		Params.Body1 = newParams.Body1.Copy();
+		Params.Body2 = newParams.Body2.Copy();
+		Params.Body3 = newParams.Body3.Copy();
+
+		await ParamsChanged.InvokeAsync(Params);
+
+		Visible = false;
+		await VisibleChanged.InvokeAsync(Visible);
+	}
+
+	private async Task Cancel()
+	{
+		Visible = false;
+		await VisibleChanged.InvokeAsync(Visible);
+	}
+}

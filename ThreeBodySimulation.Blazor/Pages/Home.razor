@@ -1,9 +1,9 @@
 ﻿@page "/"
 @using MudBlazor
-@using ThreeBodySimulation.Data
 @using ThreeBodySimulation.Blazor.Components
 @using ThreeBodySimulation.Blazor.Core
 @using ThreeBodySimulation.Blazor.Core.Extensions
+@using ThreeBodySimulation.Data
 @inject IJSRuntime JS
 
 <PageTitle>Home</PageTitle>
@@ -61,7 +61,7 @@
                     }
                     <MudButton Variant="Variant.Filled"
                     StartIcon="@Icons.Material.Filled.FileOpen"
-                    Color="Color.Surface" OnClick="LoadSimulation">
+                    Color="Color.Surface" OnClick="OnJsonButtonClicked">
                         JSON
                     </MudButton>
                 </MudStack>
@@ -73,16 +73,20 @@
     </MudItem>
 </MudGrid>
 
+<JsonOverlay @bind-Params="simulationParams" @bind-Visible="jsonOverlayVisible" />
+
 @if (isLoadingSimulation)
 {
     <div class="overlay" />
 }
 
-
 @code {
+
     private const string plotId = "three-body-plot";
 
     private CancellationTokenSource _cancellationTokenSource = null!;
+
+    private bool jsonOverlayVisible { get; set; } = false;
 
     private bool isLoadingSimulation { get; set; } = false;
     private SimulationParams simulationParams { get; set; } = new();
@@ -122,5 +126,11 @@
     private async Task CancelSimulation()
     {
         await _cancellationTokenSource.CancelAsync();
+    }
+
+    private Task OnJsonButtonClicked()
+    {
+        jsonOverlayVisible = true;
+        return Task.CompletedTask;
     }
 }
