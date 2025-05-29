@@ -10,7 +10,7 @@ The entire project consists of three main parts:
 
 1. `ThreeBodySimulation` - the core project that targets .NET Standard 2.1. It contains the main simulation logic, ODE solvers and data structures. The .NET Standard 2.1 had been chosen to support Unity, but I didn't use this engine anyway.
 2. `ThreeBodySimulation.Blazor` - the interactive three-body problem visualizer that uses Blazor and the [Plotly](https://plotly.com/javascript/) library.
-3. `ThreeBodySimulationPlotDrawer` - an F# console project that asks users to enter the initial conditions and then draws the simulation plots using [Plotly.NET](https://plotly.net/). Allows export/import to JSON. It's generally faster then the Blazor visualizer, but doesn't support the actual visualization (because the library doesn't support this).
+3. `ThreeBodySimulationPlotDrawer` - an F# console project that asks users to enter the initial conditions and then draws a plot using [Plotly.NET](https://plotly.net/). It allows parameters export/import to JSON (which is partially compatible with the blazor visualizer). It's generally faster then the Blazor visualizer, but doesn't support the actual visualization (because the library doesn't support this).
 
 ### Underlying Math
 
