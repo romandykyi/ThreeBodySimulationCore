@@ -1,4 +1,4 @@
-﻿using ThreeBodySimulation.Data;
+﻿using ThreeBodySimulation.Blazor.Core.Extensions;
 using ThreeBodySimulation.Simulation;
 using ThreeBodySimulation.Simulation.Solvers;
 using ThreeBodySimulation.Simulation.Utils;
@@ -10,11 +10,6 @@ public class Simulator(SimulationParams simulationParams)
     private const int updateRate = 1000;
     public readonly SimulationParams SimulationParams = simulationParams;
 
-    private static Body CopyBody(Body body)
-    {
-        return new Body(body.Position, body.Velocity, body.Mass);
-    }
-
     public async Task<SimulationResult?> RunAsync(CancellationToken cancellationToken, double visualizationStep = 0.01)
     {
         IBodiesSolver solver = SimulationParams.Solver switch
@@ -24,9 +19,9 @@ public class Simulator(SimulationParams simulationParams)
             _ => throw new InvalidOperationException("Unsupported solver.")
         };
 
-        var body1 = CopyBody(SimulationParams.Body1);
-        var body2 = CopyBody(SimulationParams.Body2);
-        var body3 = CopyBody(SimulationParams.Body3);
+        var body1 = SimulationParams.Body1.Copy();
+        var body2 = SimulationParams.Body2.Copy();
+        var body3 = SimulationParams.Body3.Copy();
 
         BodiesSimulator simulator = new(body1, body2, body3, solver, SimulationParams.G);
         var states = simulator.Simulate(endTime: SimulationParams.SimulationTime);
