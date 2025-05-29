@@ -1,7 +1,10 @@
 ﻿@using MudBlazor
 @using ThreeBodySimulation.Blazor.Core
 @using ThreeBodySimulation.Blazor.Core.Extensions
+@using System
 @using System.Text.Json
+
+@inject ISnackbar Snackbar
 
 <MudOverlay @bind-Visible="@Visible" AutoClose="false" DarkBackground>
 	<MudGrid Justify="Justify.Center">
@@ -67,7 +70,37 @@
 
 	private async Task Apply()
 	{
-		SimulationParams newParams = JsonSerializer.Deserialize<SimulationParams>(text);
+		SimulationParams newParams;
+		try 
+		{
+			newParams = JsonSerializer.Deserialize<SimulationParams>(text);
+		}
+		catch (JsonException e)
+		{
+			Snackbar.Add(e.Message, Severity.Error);
+			return;
+		}
+
+		if (!Enum.IsDefined(typeof(SolverType), newParams.Solver))
+		{
+			Snackbar.Add("Invalid solver type.", Severity.Error);
+			return;
+		}
+		if (newParams.G <= 0.0)
+		{
+			Snackbar.Add("Invalid Gravitational Constant.", Severity.Error);
+			return;
+		}
+		if (newParams.SimulationTime <= 0.0)
+		{
+			Snackbar.Add("Invalid Simulation Time.", Severity.Error);
+			return;
+		}
+		if (newParams.StepSize <= 0)
+		{
+			Snackbar.Add("Invalid Step Size.", Severity.Error);
+			return;
+		}
 
 		Params.G = newParams.G;
 		Params.Solver = newParams.Solver;
@@ -82,6 +115,8 @@
 
 		Visible = false;
 		await VisibleChanged.InvokeAsync(Visible);
+
+		Snackbar.Add("JSON parameters were applied successfully.", Severity.Info);
 	}
 
 	private async Task Cancel()
