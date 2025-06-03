@@ -33,9 +33,8 @@ jobs:
             - name: Commit wwwroot to GitHub Pages
               uses: JamesIves/github-pages-deploy-action@4
               with:
-                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-                  BASE_BRANCH: master
-                  BRANCH: gh-pages
-                  FOLDER: release/wwwroot
+                token: ${{ secrets.GITHUB_TOKEN }}
+                branch: gh-pages
+                folder: release/wwwroot
                   
 # Based on https://swimburger.net/blog/dotnet/how-to-deploy-aspnet-blazor-webassembly-to-github-pages
