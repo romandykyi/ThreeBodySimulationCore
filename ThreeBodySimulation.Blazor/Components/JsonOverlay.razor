@@ -64,7 +64,7 @@
 	public EventCallback<bool> VisibleChanged { get; set; }
 
 	[Parameter]
-	public SimulationParams Params { get; set; }
+	public SimulationParams Params { get; set; } = null!;
 	[Parameter]
 	public EventCallback<SimulationParams> ParamsChanged { get; set; }
 
@@ -73,7 +73,13 @@
 		SimulationParams newParams;
 		try 
 		{
-			newParams = JsonSerializer.Deserialize<SimulationParams>(text);
+			var deserializedParams = JsonSerializer.Deserialize<SimulationParams>(text);
+			if (deserializedParams == null)
+			{
+				Snackbar.Add("Failed to parse JSON.", Severity.Error);
+				return;
+			}
+			newParams = deserializedParams;
 		}
 		catch (JsonException e)
 		{
